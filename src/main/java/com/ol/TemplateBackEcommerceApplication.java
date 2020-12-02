@@ -23,6 +23,9 @@ public class TemplateBackEcommerceApplication {
 	}
 
 	// spring boot 2.x
+    /**
+     * @return
+     
     @Bean
     public ServletWebServerFactory servletContainer() {
         TomcatServletWebServerFactory tomcat = new TomcatServletWebServerFactory() {
@@ -48,5 +51,5 @@ public class TemplateBackEcommerceApplication {
         connector.setRedirectPort(8443);
         return connector;
     }
-
+*/
 }

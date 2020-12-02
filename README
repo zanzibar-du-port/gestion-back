@@ -1,0 +1,48 @@
+En local :
+
+in application.properties
+ -> change server.ssl.key-store to url
+ -> change password
+docker build -t template-back-ecommerce .
+docker tag template-back-ecommerce olivierlasbleis/template-back-ecommerce
+docker push olivierlasbleis/template-back-ecommerce
+
+Sur serveur
+
+create folder <app-name>
+cd <app-name>
+git clone https://github.com/certbot/certbot
+cd certbot
+./certbot-auto certonly -a standalone -d example.com -d www.example.com
+cd /etc/letsencrypt/live/example.com
+openssl pkcs12 -export -in fullchain.pem -inkey privkey.pem -out keystore.p12 -name tomcat -CAfile chain.pem -caname root
+cd /home/debian/<app-name>
+mkdir docker-compose.yml
+
+copy / past :
+
+version: '3'
+
+services:
+
+  mysql-standalone:
+    image: mysql:5.6
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=sa
+      - MYSQL_PASSWORD=password
+    ports:
+      - 3306:3306
+
+
+  crbackend:
+    image: olivierlasbleis/template-back-ecommerce
+    container_name: template-back-ecommerce
+    restart: on-failure
+    depends_on:
+      - mysql-standalone
+    volumes:
+      - /etc/letsencrypt/live/safara-solaire.website/keystore.p12:/etc/letsencrypt/live/safara-solaire.website/keystore.p12
+    ports:
+    - 8000:8443

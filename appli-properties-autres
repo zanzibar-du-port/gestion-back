@@ -18,3 +18,11 @@ spring.datasource.url=jdbc:h2:mem:db
 spring.datasource.username=sa
 spring.datasource.password=
 
+
+
+security.require-ssl=true
+server.ssl.key-store=/etc/letsencrypt/live/safara-solaire.website/keystore.p12
+server.ssl.key-store-password=password
+server.ssl.keyStoreType=PKCS12
+server.ssl.keyAlias=tomcat
+
