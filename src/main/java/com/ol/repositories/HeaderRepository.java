@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.ol.models.Header;
 
 @Repository
-public interface HeaderRepository extends JpaRepository<Header, Long>{
+public interface HeaderRepository extends JpaRepository<Header, Integer>{
 
 	
 }

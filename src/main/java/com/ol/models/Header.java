@@ -20,16 +20,16 @@ public class Header {
 	
 	@Id
 	@Column(name = "id")
-	private Long id;
+	private Integer id;
 	private String titre;
 	private String paragraph;
 	@ManyToOne(cascade = {CascadeType.ALL})
 	@JoinColumn(name = "IMAGE_ID")
 	private Image image;
 	
-	public Header(Long id, String titre, String paragraph, Image image) {
+	public Header(Integer id, String titre, String paragraph, Image image) {
 		super();
-		this.id = new Long(1);
+		this.id = new Integer(1);
 		this.titre = titre;
 		this.paragraph = paragraph;
 		this.image = image;

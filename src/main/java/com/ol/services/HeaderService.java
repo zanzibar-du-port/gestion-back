@@ -23,9 +23,7 @@ public class HeaderService {
 	}
 
 	public Header getHeader() {
-		// TODO Auto-generated method stub
-		Header header = headerRepository.findById(new Long(1)).get();
-		
+		Header header = headerRepository.findById(new Integer(1)).get();
 		return header;
 	}
 

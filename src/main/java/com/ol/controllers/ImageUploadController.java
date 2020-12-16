@@ -25,7 +25,6 @@ import com.ol.repositories.ImageRepository;
 import com.ol.services.ImageService;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping(path = "image")
 public class ImageUploadController {
 
@@ -41,10 +40,21 @@ public class ImageUploadController {
 		imageService.save(img);
 		return ResponseEntity.status(HttpStatus.OK).build();
 	}
-	@GetMapping(path = { "/get/{imageName}" })
-	public Image getImage(@PathVariable("imageName") String imageName) throws IOException {
-		final Optional<Image> retrievedImage = imageService.findByName(imageName);
+	@GetMapping(path = { "/get/{imageId}" })
+	public Image getImage(@PathVariable("imageId") Integer imageId) throws IOException {
+		final Optional<Image> retrievedImage = imageService.findById(imageId);
 		return retrievedImage.get();
+	}
+	
+	@GetMapping(path = { "/delete/{imageId}" })
+	public ResponseEntity<Object> deleteImage(@PathVariable("imageId") Integer imageId) throws IOException {
+		try {
+			imageService.delete(imageId);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
+		}
+		
+		return ResponseEntity.status(HttpStatus.OK).build();
 	}
 	
 	@GetMapping(path = { "/getAll" })

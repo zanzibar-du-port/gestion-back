@@ -27,9 +27,9 @@ public class ImageService {
 		return imageRepository.save(img);
 	}
 
-	public Optional<Image> findByName(String imageName) {
+	public Optional<Image> findById(Integer imageId) {
 		// TODO Auto-generated method stub
-		return imageRepository.findByName(imageName);
+		return imageRepository.findById(imageId);
 	}
 	
 	public List<Image> getAll() {
@@ -71,6 +71,11 @@ public class ImageService {
 			} catch (DataFormatException e) {
 			}
 			return outputStream.toByteArray();
+		}
+
+		public void delete(Integer imageId) {
+			// TODO Auto-generated method stub
+			imageRepository.delete(imageRepository.findById(imageId).get());;
 		}
 
 }

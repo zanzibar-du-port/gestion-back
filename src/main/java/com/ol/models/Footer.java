@@ -17,7 +17,7 @@ public class Footer {
 
 	@Id
 	@Column(name = "id")
-	private Long id;
+	private Integer id;
 	private String titre;
 	private String paragraph;
 	private String textInput;
@@ -26,9 +26,9 @@ public class Footer {
 	@JoinColumn(name = "IMAGE_ID")
 	private Image image;
 	
-	public Footer(Long id, String titre, String paragraph, Image image) {
+	public Footer(Integer id, String titre, String paragraph, Image image) {
 		super();
-		this.id = new Long(1);
+		this.id = new Integer(1);
 		this.titre = titre;
 		this.paragraph = paragraph;
 		this.image = image;

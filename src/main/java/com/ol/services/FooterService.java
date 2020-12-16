@@ -24,7 +24,7 @@ public class FooterService {
 
 	public Footer getFooter() {
 		// TODO Auto-generated method stub
-		Footer footer = footerRepository.findById(new Long(1)).get();
+		Footer footer = footerRepository.findById(new Integer(1)).get();
 		
 		return footer;
 	}
