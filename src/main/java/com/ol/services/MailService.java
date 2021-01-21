@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import com.ol.models.Commande;
 import com.ol.models.Produit;
+import com.ol.models.auth.Utilisateur;
 
 
 @Service
@@ -37,21 +38,30 @@ public class MailService {
 	InfosGeneralesService infosGeneralesService;
 	
 	@Value("${admin.email}")
-	private static String emailAdmin;
+	private String emailAdmin;
 	@Value("${admin.mdp}")
-	private static String mdpAdmin;
+	private String mdpAdmin;
 	@Value("${admin.urlsite}")
-	private static String urlSite;
+	private String urlSite;
 
 	public void sendMailCommande(Commande commande) {
+		
 		sendMail(writeMailClient(commande),
 				emailAdmin,
-				commande.getAdresseEmail(),
+				commande.getContactClient().getClient().getAdresseEmail(),
 				"votre commande sur " + urlSite
 				);
+		
 		sendMail(writeMailAdmin(commande),
 				emailAdmin,
-				commande.getAdresseEmail(),
+				commande.getContactClient().getClient().getAdresseEmail(),
+				"nouvelle commande d'un montant de : " + commande.getPrixPanier() + " en " + commande.getMethodeDeReceptionProduits());
+	}
+	
+	public void sendMailNouveauContact(Utilisateur utilisateur) {
+		sendMail(writeMailAdminNouveauContact(utilisateur),
+				emailAdmin,
+				utilisateur.getAdresseMail(),
 				"votre commande sur " + urlSite
 				);
 	}
@@ -59,7 +69,7 @@ public class MailService {
 	private String writeMailClient(Commande commande) {
 		String newLine = System.getProperty("line.separator");
 		String listeProduits = getListeProduits(commande);
-		return "Bonjour " + commande.getNomPrenom()
+		return "Bonjour " + commande.getContactClient().getNomPrenom()
 		+ newLine + "Merci pour votre commande dont voici le résumé"
 		+ newLine + listeProduits
 		+ newLine
@@ -74,34 +84,47 @@ public class MailService {
 	private String writeMailAdmin(Commande commande) {
 		String newLine = System.getProperty("line.separator");
 		String listeProduits = getListeProduits(commande);
-		return "Bonjour " + commande.getNomPrenom()
-					+ newLine + "Merci pour votre commande dont voici le résumé"
+		return "Bonjour " + commande.getContactClient().getNomPrenom()
+					+ newLine + "Voici une nouvelle commande :"
 					+ newLine + listeProduits
 					+ newLine
-					+ newLine + "Votre code de récupération est : " + commande.getCodeRecuperation()
-					+ newLine 
-					+ newLine + infosGeneralesService.getInfosGenerales().getTextMailCommande()
+					+ newLine + "Informations sur la commande : "
+					+ newLine + "Type decommande : " + commande.getMethodeDeReceptionProduits()
+					+ newLine + "Nom et prénom : " + commande.getContactClient().getNomPrenom()
+					+ newLine + "Téléphone : " + commande.getContactClient().getTelephone()
+					+ newLine + "Adresse mail : " + commande.getContactClient().getClient().getAdresseEmail()
+					+ newLine + "Nom et prénom : " + commande.getContactClient().getAdresse()
+					+ newLine + "Nom et prénom : " + commande.getContactClient().getNomPrenom()
+					+ newLine + "Nom et prénom : " + commande.getContactClient().getNomPrenom()
+					+ newLine + "Nom et prénom : " + commande.getContactClient().getNomPrenom()
+					+ newLine + "Le code de récupération est : " + commande.getCodeRecuperation()
 					+ newLine
 					+ newLine
 					+ newLine + "A bientôt";
 	}
+	
+	private String writeMailAdminNouveauContact(Utilisateur utilisateur) {
+		String newLine = System.getProperty("line.separator");
+		return "Bonjour " 
+					+ newLine + "Un nouveau contact pour la newsletter : " + utilisateur.getAdresseMail()
+					+ newLine
+					+ newLine + "Bonne journée";
+	}
+	/**
+	 * @param commande
+	 * @return
+	 */
 	private String getListeProduits(Commande commande) {
 		String newLine = System.getProperty("line.separator");
 		String listeProduits = "";
-		for (Produit produit : commande.getListeProduits()) {
-			listeProduits = listeProduits 
-					+ newLine 
-					+ produit.getTitre() + " - " 
-					+ BigDecimal.valueOf(produit.getPrix()).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP) 
-					+ " euros"; 
-		}
+		
 		return listeProduits;
 					
 	}
 
-	public static void sendMail(String bodyMail, String expediteur, String destinataire, String objet) {
-		final String username = emailAdmin;
-        final String password = mdpAdmin;
+	public void sendMail(String bodyMail, String expediteur, String destinataire, String objet) {
+		String username = emailAdmin;
+        String password = mdpAdmin;
 
         Properties prop = new Properties();
         prop.put("mail.smtp.host", "smtp.gmail.com");
@@ -150,6 +173,8 @@ public class MailService {
             e.printStackTrace();
         }
 	}
+
+	
 	
 	
 }

@@ -74,8 +74,11 @@ public class ImageService {
 		}
 
 		public void delete(Integer imageId) {
-			// TODO Auto-generated method stub
 			imageRepository.delete(imageRepository.findById(imageId).get());;
+		}
+
+		public List<Image> getListeImageByIdProduit(Integer idProduit) {
+			return imageRepository.getListeImageByIdProduit(idProduit);
 		}
 
 }

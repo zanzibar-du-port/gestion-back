@@ -1,6 +1,8 @@
 package com.ol;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Iterator;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -13,10 +15,13 @@ import com.ol.models.Image;
 import com.ol.models.InfosGenerales;
 import com.ol.models.auth.Role;
 import com.ol.models.auth.Utilisateur;
+import com.ol.models.utils.UtilsLocalDateParHeure;
 import com.ol.repositories.FooterRepository;
 import com.ol.repositories.HeaderRepository;
 import com.ol.repositories.InfosGeneralesRepository;
 import com.ol.repositories.UtilisateurRepository;
+import com.ol.repositories.utils.UtilsLocalDateParHeureRepository;
+import com.ol.services.ScheduleService;
 
 
 /**
@@ -32,22 +37,18 @@ public class StartupDataInit {
 	private Boolean isDataInit;
 
 	private UtilisateurRepository utilisateurRepository;
-
-	private HeaderRepository headerRepository;
-
-	private FooterRepository footerRepository;
-
-	private InfosGeneralesRepository infosGeneralesRepository;
-
 	
+	private UtilsLocalDateParHeureRepository utilsLocalDateParHeureRepository;
 
-	public StartupDataInit(UtilisateurRepository utilisateurRepository, HeaderRepository headerRepository,
-			FooterRepository footerRepository, InfosGeneralesRepository infosGeneralesRepository) {
+	private ScheduleService scheduleService;
+	
+	public StartupDataInit(UtilisateurRepository utilisateurRepository, 
+			UtilsLocalDateParHeureRepository utilsLocalDateParHeureRepository,
+			ScheduleService scheduleService) {
 		super();
 		this.utilisateurRepository = utilisateurRepository;
-		this.headerRepository = headerRepository;
-		this.footerRepository = footerRepository;
-		this.infosGeneralesRepository = infosGeneralesRepository;
+		this.utilsLocalDateParHeureRepository = utilsLocalDateParHeureRepository;
+		this.scheduleService = scheduleService;
 	}
 
 
@@ -70,9 +71,9 @@ public class StartupDataInit {
 						"$2a$10$RIaf88opNE8abA590j8NiOW/chpEn7q/mDdzBHFqboRJIF/fZ5gi2", 
 						Arrays.asList(new Role("ROLE_USER"))));
 			}
-			
-			
+			this.scheduleService.ajoutQuotidienUtilsLocalDateParHeure();
 		}
+		
 
 	}
 

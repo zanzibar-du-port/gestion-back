@@ -24,6 +24,8 @@ public class UtilisateurService {
 	UtilisateurRepository utilisateurRepository;
 	@Autowired
 	PasswordEncoder passwordEncoder;
+	@Autowired
+	MailService mailService;
 	
 	/**
 	 * @param utilisateurCreationComptePost
@@ -54,6 +56,15 @@ public class UtilisateurService {
 		Utilisateur utilisateur = utilisateurRepository.findByIdentifiant(UtilisateurConnecteUtils.recupererIdentifiant()).orElseThrow(UtilisateurNonTrouveException::new);
 		
 		return utilisateur;
+	}
+
+	public Utilisateur saveUtilisateur(Utilisateur utilisateur) {
+		return utilisateurRepository.save(utilisateur);
+	}
+	
+	public Utilisateur saveContact(Utilisateur utilisateur) {
+		mailService.sendMailNouveauContact(utilisateur);
+		return utilisateurRepository.save(utilisateur);
 	}
 
 }

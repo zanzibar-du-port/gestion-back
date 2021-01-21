@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.ol.models.Commande;
+import com.ol.models.Produit;
 
 @Repository
 public interface CommandeRepository extends JpaRepository<Commande, Integer>{
@@ -16,5 +17,9 @@ public interface CommandeRepository extends JpaRepository<Commande, Integer>{
 	@Query(value = "SELECT * FROM commande WHERE date_heure > :dateCourante", 
 			  nativeQuery = true)
 	List<Commande> getAllDepuis(@Param("dateCourante") LocalDateTime dateCourante);
+
+	@Query(value = "SELECT * FROM commande WHERE date_heure > dateHeurePassee", 
+			  nativeQuery = true)
+	List<Commande> findDepuis(LocalDateTime dateHeurePassee);
 
 }
