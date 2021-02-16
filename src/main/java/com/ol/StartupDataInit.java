@@ -9,19 +9,9 @@ import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import com.ol.models.Footer;
-import com.ol.models.Header;
-import com.ol.models.Image;
-import com.ol.models.InfosGenerales;
 import com.ol.models.auth.Role;
 import com.ol.models.auth.Utilisateur;
-import com.ol.models.utils.UtilsLocalDateParHeure;
-import com.ol.repositories.FooterRepository;
-import com.ol.repositories.HeaderRepository;
-import com.ol.repositories.InfosGeneralesRepository;
 import com.ol.repositories.UtilisateurRepository;
-import com.ol.repositories.utils.UtilsLocalDateParHeureRepository;
-import com.ol.services.ScheduleService;
 
 
 /**
@@ -38,17 +28,9 @@ public class StartupDataInit {
 
 	private UtilisateurRepository utilisateurRepository;
 	
-	private UtilsLocalDateParHeureRepository utilsLocalDateParHeureRepository;
-
-	private ScheduleService scheduleService;
-	
-	public StartupDataInit(UtilisateurRepository utilisateurRepository, 
-			UtilsLocalDateParHeureRepository utilsLocalDateParHeureRepository,
-			ScheduleService scheduleService) {
+	public StartupDataInit(UtilisateurRepository utilisateurRepository) {
 		super();
 		this.utilisateurRepository = utilisateurRepository;
-		this.utilsLocalDateParHeureRepository = utilsLocalDateParHeureRepository;
-		this.scheduleService = scheduleService;
 	}
 
 
@@ -66,12 +48,11 @@ public class StartupDataInit {
 	public void init() throws Exception {
 
 		if(isDataInit) {
-			if(!utilisateurRepository.findByIdentifiant("lasbleis.olivier@yahoo.fr").isPresent()) {
-				utilisateurRepository.save(new Utilisateur("lasbleis.olivier@yahoo.fr", 
-						"$2a$10$RIaf88opNE8abA590j8NiOW/chpEn7q/mDdzBHFqboRJIF/fZ5gi2", 
+			if(!utilisateurRepository.findByIdentifiant("epicerieduportcommandes@gmail.com").isPresent()) {
+				utilisateurRepository.save(new Utilisateur("epicerieduportcommandes@gmail.com", 
+						"$2a$10$X5ByNfZa0/8G.qy4hAQ07OZODumBbYwsoa4KaSrhI1JwqMjxXAgtC", 
 						Arrays.asList(new Role("ROLE_USER"))));
 			}
-			this.scheduleService.ajoutQuotidienUtilsLocalDateParHeure();
 		}
 		
 

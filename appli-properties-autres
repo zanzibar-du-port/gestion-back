@@ -16,6 +16,15 @@ spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 
+server.port=8081
+spring.datasource.url=jdbc:mysql://localhost:3306/ma_petite_carte_postale?user=root&password=lasbleis&serverTimezone=UTC
+spring.datasource.username=root
+spring.datasource.password=lasbleis
+spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+
 spring.datasource.url=jdbc:mysql://mysql-standalone:3306/test
 spring.datasource.username=sa
 spring.datasource.password=password
@@ -36,3 +45,12 @@ server.ssl.key-store-password=password
 server.ssl.keyStoreType=PKCS12
 server.ssl.keyAlias=tomcat
 
+
+#stripe keys
+stripe.key.public=pk_live_51IGIdKFtkwBoQdySWQMS8b1V8pnFE80grHWEbGKKwVxnCErHVKgK8xk1M2DJtRffRKCO6QP1qkjbVmIdUKvV49oY00MqXYN4Ud
+stripe.key.secret=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
+
+
+#stripe keys
+stripe.key.public=pk_test_51HiGZdJbzYV33WGmUnah8PQME6cv8tIWR5p3JcIfZuNB4AZV6hlCsAL3JXPKNuhpAUgKLkkeeUw5PzRx1jgjaQxE00X08qIiTK
+stripe.key.secret=sk_test_51HiGZdJbzYV33WGmLFD5cMrMNfu6ClYfYoIU8wI6wukaMxF3KkdfjNTek0yrt8JdpO5fXpt80xnSfbmih0AkKPlw00cig8Jar0

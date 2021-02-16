@@ -12,10 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ol.models.Produit;
 import com.ol.models.auth.Utilisateur;
 import com.ol.repositories.UtilisateurRepository;
-import com.ol.services.ProduitService;
 import com.ol.services.UtilisateurService;
 
 @RestController

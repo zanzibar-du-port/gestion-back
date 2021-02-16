@@ -1,15 +1,18 @@
 package com.ol.services;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.util.Properties;
-import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
-import javax.activation.DataHandler;
-import javax.activation.DataSource;
-import javax.activation.FileDataSource;
+import com.ol.models.Fournisseur;
+import com.ol.models.Produit;
+import com.ol.models.fromfront.CommandeFromFront;
+import com.ol.models.fromfront.CommandeProduitFromFront;
+import com.ol.models.fromfront.MailFromFront;
+import com.ol.repositories.FournisseurRepository;
+import com.ol.repositories.ProduitRepository;
+
+import java.util.Properties;
 import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -22,107 +25,55 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import com.ol.models.Commande;
-import com.ol.models.Produit;
-import com.ol.models.auth.Utilisateur;
-
-
 @Service
 public class MailService {
 	
 	@Autowired
-	InfosGeneralesService infosGeneralesService;
+	ProduitRepository produitRepository;
+
+	@Autowired
+	FournisseurRepository fournisseurRepository;
 	
 	@Value("${admin.email}")
 	private String emailAdmin;
 	@Value("${admin.mdp}")
 	private String mdpAdmin;
-	@Value("${admin.urlsite}")
-	private String urlSite;
 
-	public void sendMailCommande(Commande commande) {
+	public MailFromFront getMailFromFrontByCommandeFromFront(CommandeFromFront commandeFromFront) {
 		
-		sendMail(writeMailClient(commande),
-				emailAdmin,
-				commande.getContactClient().getClient().getAdresseEmail(),
-				"votre commande sur " + urlSite
-				);
+		String textMail = "Bonjour, \n" +
+						"Voici la commande pour l'Epicerie du port \n\n";
 		
-		sendMail(writeMailAdmin(commande),
-				emailAdmin,
-				commande.getContactClient().getClient().getAdresseEmail(),
-				"nouvelle commande d'un montant de : " + commande.getPrixPanier() + " en " + commande.getMethodeDeReceptionProduits());
-	}
-	
-	public void sendMailNouveauContact(Utilisateur utilisateur) {
-		sendMail(writeMailAdminNouveauContact(utilisateur),
-				emailAdmin,
-				utilisateur.getAdresseMail(),
-				"votre commande sur " + urlSite
-				);
-	}
-	
-	private String writeMailClient(Commande commande) {
-		String newLine = System.getProperty("line.separator");
-		String listeProduits = getListeProduits(commande);
-		return "Bonjour " + commande.getContactClient().getNomPrenom()
-		+ newLine + "Merci pour votre commande dont voici le résumé"
-		+ newLine + listeProduits
-		+ newLine
-		+ newLine + "Votre code de récupération est : " + commande.getCodeRecuperation()
-		+ newLine 
-		+ newLine + infosGeneralesService.getInfosGenerales().getTextMailCommande()
-		+ newLine
-		+ newLine
-		+ newLine + "A bientôt";
-					
-	}
-	private String writeMailAdmin(Commande commande) {
-		String newLine = System.getProperty("line.separator");
-		String listeProduits = getListeProduits(commande);
-		return "Bonjour " + commande.getContactClient().getNomPrenom()
-					+ newLine + "Voici une nouvelle commande :"
-					+ newLine + listeProduits
-					+ newLine
-					+ newLine + "Informations sur la commande : "
-					+ newLine + "Type decommande : " + commande.getMethodeDeReceptionProduits()
-					+ newLine + "Nom et prénom : " + commande.getContactClient().getNomPrenom()
-					+ newLine + "Téléphone : " + commande.getContactClient().getTelephone()
-					+ newLine + "Adresse mail : " + commande.getContactClient().getClient().getAdresseEmail()
-					+ newLine + "Nom et prénom : " + commande.getContactClient().getAdresse()
-					+ newLine + "Nom et prénom : " + commande.getContactClient().getNomPrenom()
-					+ newLine + "Nom et prénom : " + commande.getContactClient().getNomPrenom()
-					+ newLine + "Nom et prénom : " + commande.getContactClient().getNomPrenom()
-					+ newLine + "Le code de récupération est : " + commande.getCodeRecuperation()
-					+ newLine
-					+ newLine
-					+ newLine + "A bientôt";
-	}
-	
-	private String writeMailAdminNouveauContact(Utilisateur utilisateur) {
-		String newLine = System.getProperty("line.separator");
-		return "Bonjour " 
-					+ newLine + "Un nouveau contact pour la newsletter : " + utilisateur.getAdresseMail()
-					+ newLine
-					+ newLine + "Bonne journée";
-	}
-	/**
-	 * @param commande
-	 * @return
-	 */
-	private String getListeProduits(Commande commande) {
-		String newLine = System.getProperty("line.separator");
-		String listeProduits = "";
+		for (CommandeProduitFromFront commandeProduitFromFront : commandeFromFront.getListeCommandeProduitFromFront()) {
+			Produit produit = produitRepository.findById(commandeProduitFromFront.getIdProduit()).get();
+			if(commandeProduitFromFront.getNbLots() != 0) {
+				if(produit.getNbProduitParLot() > 1) {
+					textMail = textMail
+							+ commandeProduitFromFront.getNbLots() 
+							+ " lot(s) de " + produit.getNbProduitParLot() + " " + produit.getNom() 
+							+ " (référence : " + produit.getReference() + ") \n";
+				}else {
+					textMail = textMail
+							+ commandeProduitFromFront.getNbLots() 
+							+ " " + produit.getNom() 
+							+ " (référence : " + produit.getReference() + ") \n";
+				}
+			}
+			
+			
+		}
+		textMail = textMail
+				+ "\n" 
+				+ "Cordialement \n"
+				+ "\n"
+				+ "Melanie Jacq";
 		
-		return listeProduits;
-					
+		Fournisseur fournisseur = fournisseurRepository.findByIdProduit(commandeFromFront.getListeCommandeProduitFromFront().get(0).getIdProduit()).get();
+		
+		return new MailFromFront(fournisseur.getEmail(), "Commande Epicerie du Port", textMail);
 	}
 
-	public void sendMail(String bodyMail, String expediteur, String destinataire, String objet) {
+	public void sendMail(MailFromFront mailFromFront) {
 		String username = emailAdmin;
         String password = mdpAdmin;
 
@@ -142,19 +93,19 @@ public class MailService {
         try {
 
             Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(expediteur));
+            message.setFrom(new InternetAddress("Epicerie-du-port"));
             message.setRecipients(
                     Message.RecipientType.TO,
-                    InternetAddress.parse(destinataire)
+                    InternetAddress.parse(mailFromFront.getDestinataire())
             );
            
-				message.setSubject(objet);
+				message.setSubject(mailFromFront.getObjet());
 
             	// Create the message part
                 BodyPart messageBodyPart = new MimeBodyPart();
 
                 // Now set the actual message
-                messageBodyPart.setText(bodyMail);
+                messageBodyPart.setText(mailFromFront.getTexteMail());
 
                 // Create a multipar message
                 Multipart multipart = new MimeMultipart();
@@ -174,7 +125,4 @@ public class MailService {
         }
 	}
 
-	
-	
-	
 }

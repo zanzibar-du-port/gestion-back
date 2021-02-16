@@ -1,74 +1,72 @@
 package com.ol.services;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.ol.models.Commande;
-import com.ol.models.fromfrontclient.CommandeFromFrontClient;
+import com.ol.models.CommandeProduit;
+import com.ol.models.fromfront.CommandeFromFront;
+import com.ol.models.fromfront.FournisseurFromFront;
+import com.ol.repositories.CommandeProduitRepository;
 import com.ol.repositories.CommandeRepository;
-import com.ol.repositories.ProduitRepoSitory;
+import com.ol.repositories.FournisseurRepository;
+import com.ol.repositories.ProduitRepository;
 
 @Service
 public class CommandeService {
 
 	@Autowired
+	MailService mailService;
+	
+	@Autowired
+	CommandeProduitRepository commandeProduitRepository;
+
+	@Autowired
 	CommandeRepository commandeRepository;
 	
 	@Autowired
-	ProduitRepoSitory produitRepository;
-	
-	@Autowired
-	ProduitService produitService;
+	FournisseurRepository fournisseurRepository;
 
 	@Autowired
-	SelectionService selectionService;
-
-	@Autowired
-	UtilsService utilsService;
+	ProduitRepository produitRepository;
 	
-	public Commande save(Commande commande) {
-		commande.getListeSelection().stream().forEach(s -> utilsService.addAchatSelection(s));
-		return commandeRepository.save(commande);
+	public CommandeFromFront getMailFromFrontByCommandeFromFront(CommandeFromFront commandeFromFront) {
+		commandeFromFront.setMailFromFront(mailService.getMailFromFrontByCommandeFromFront(commandeFromFront));
+		return commandeFromFront;
 	}
-	
-	//TODO adapter calcul du prix selon selection et non produit
-	public boolean isPriceOk(CommandeFromFrontClient commandeFromFrontClient){
+
+	public CommandeFromFront postCommandeFromFront(CommandeFromFront commandeFromFront) {
+		mailService.sendMail(commandeFromFront.getMailFromFront());
 		
-		int prixListeSelectionBdd = selectionService.getTotalPrixPanier(commandeFromFrontClient.getListeIdSelection());
+		Commande commande = commandeRepository.save(
+				new Commande(
+						LocalDateTime.now(),
+						fournisseurRepository.findByIdProduit(commandeFromFront.getListeCommandeProduitFromFront().get(0).getIdProduit()).get()
+						));
 		
-		int prixLivraisonBdd = 0;
-		if(commandeFromFrontClient.getMethodeDeReceptionProduits().equals("LIVRAISON")) {
-			prixLivraisonBdd = selectionService.getPrixLivraison(commandeFromFrontClient.getListeIdSelection());
-		}
+		commandeFromFront.getListeCommandeProduitFromFront().stream().forEach(
+				commandeProduitFromFront -> 
+					commandeProduitRepository.save(
+							new CommandeProduit(
+									commandeProduitFromFront.getNbLots(),
+									produitRepository.findById(commandeProduitFromFront.getIdProduit()).get(),
+									commande
+									)));
 		
-		if (prixListeSelectionBdd == commandeFromFrontClient.getPrixPanier()
-				&& prixLivraisonBdd == commandeFromFrontClient.getPrixLivraison()) {
-			return true;
-		}else {
-			return false;
-		}
-		
-		
-		
+		return commandeFromFront;
 	}
 	
-	public List<Commande> getAllDepuis(Integer nbJours) {
-		return commandeRepository.getAllDepuis(LocalDateTime.now().minusDays(nbJours) );
+
+	public List<Integer> getDernieresCommandesByIdProduit(Integer idProduit){
+		List<Integer> listeNbCommande = commandeProduitRepository.getDeuxDernieresCommandesByIdProduit(idProduit);
+			while (listeNbCommande.size() < 2) {
+				listeNbCommande.add(0, 0);
+			}
+		return listeNbCommande;
+		
 	}
 
-	public Iterable<Commande> getAll() {
-		return commandeRepository.findAll();
-	}
-
-
-	public List<Commande> getDepuis(Integer nJours) {
-		LocalDateTime dateHeurePasse = LocalDateTime.now().minusDays(nJours);
-		return commandeRepository.findDepuis(dateHeurePasse);
-	}
 }

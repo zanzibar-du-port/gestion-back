@@ -24,8 +24,6 @@ public class UtilisateurService {
 	UtilisateurRepository utilisateurRepository;
 	@Autowired
 	PasswordEncoder passwordEncoder;
-	@Autowired
-	MailService mailService;
 	
 	/**
 	 * @param utilisateurCreationComptePost
@@ -63,7 +61,6 @@ public class UtilisateurService {
 	}
 	
 	public Utilisateur saveContact(Utilisateur utilisateur) {
-		mailService.sendMailNouveauContact(utilisateur);
 		return utilisateurRepository.save(utilisateur);
 	}
 

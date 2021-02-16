@@ -42,11 +42,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		final CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200","http://localhost:4201"
-				,"http://localhost:4202"
-				,"http://146.59.154.95:4200"
-				,"http://146.59.154.95:4201"
-				,"http://146.59.154.95:4202"));
+		configuration.setAllowedOrigins(Arrays.asList("http://51.91.10.40:4200"));
 		configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
 		// setAllowCredentials(true) is important, otherwise:
 		// The value of the 'Access-Control-Allow-Origin' header in the response
@@ -79,57 +75,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers(HttpMethod.POST, "/authentification/auth").permitAll()
 		.antMatchers(HttpMethod.GET, "/authentification/auth/user").permitAll()
 		.antMatchers(HttpMethod.POST, "/utilisateur/addUtilisateur").permitAll()
-		.antMatchers(HttpMethod.POST, "/stripe/**").permitAll()
-		.antMatchers(HttpMethod.POST, "/footer/changeFooter").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/footer/getFooter").permitAll()
-		.antMatchers(HttpMethod.POST, "/header/changeHeader").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/header/getHeader").permitAll()
-		.antMatchers(HttpMethod.GET, "/image/delete/{imageId}").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.POST, "/image/upload").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/image/get/{imageId}").permitAll()
-		.antMatchers(HttpMethod.GET, "/image/getAll").permitAll()
-		.antMatchers(HttpMethod.POST, "/infosGenerales/changeInfosGenerales").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/infosGenerales/**").permitAll() 
-		.antMatchers(HttpMethod.POST, "/produit/addProduit").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/produit/getAll").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/produit/getAllProduitToFrontClient/{pagination}").permitAll()
-		.antMatchers(HttpMethod.GET, "/produit/getAllProduitToFrontClientByLibelleCategorie/{categorie}/{pagination}").permitAll()
-		.antMatchers(HttpMethod.GET, "/produit/getAllProduitToFrontClientByLibelleCategorieAndLibelleSousCategorie/{categorie}/{sousCategorie}/{pagination}").permitAll()
-		.antMatchers(HttpMethod.GET, "/produit/getOneProduitToFrontClient/{idProduit}").permitAll()
-		.antMatchers(HttpMethod.GET, "/getOneProduitFromFrontAdmin/{idProduit}").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.DELETE, "/produit/delete/{produitId}").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/produit/get/{produitId}").permitAll()
-		.antMatchers(HttpMethod.GET, "/produit/addVue/{produitId}").permitAll()
-		.antMatchers(HttpMethod.POST, "/produit/getProduitsActifs").permitAll()
-		.antMatchers(HttpMethod.GET, "/produit/getProduitsActifs").permitAll()
-		.antMatchers(HttpMethod.GET, "/produit/getProduitDetailToFrontClientById/{idProduit}").permitAll()
-		.antMatchers(HttpMethod.GET, "/categorie/getAllCategorie").permitAll()
-		.antMatchers(HttpMethod.GET, "/categorie/getAllSousCategoriesByLibelleCategorie/{libelleCategorie}").permitAll()
-		.antMatchers(HttpMethod.GET, "/categorie/getAllCategorieDetailToFrontAdmin").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/categorie/getAllSousCategorieDetailToFrontAdminByIdCategorie/{idCategorie}").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/categorie/changePositionDansLaListeCategorie/{idCategorie}").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/categorie/changePositionDansLaListeSousCategorie/{idCategorie}").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.POST, "/selection/getSelectionsActifs").permitAll()
-		.antMatchers(HttpMethod.POST, "/selection/getListeSelectionPanierToFrontClient").permitAll()
-		.antMatchers(HttpMethod.POST, "/selection/getPrixLivraison").permitAll()
-		.antMatchers(HttpMethod.POST, "/selection/getTotalPrixPanier").permitAll()
-		.antMatchers(HttpMethod.POST, "/commande/paymentintent").permitAll()
-		.antMatchers(HttpMethod.POST, "/commande/confirm/{id}").permitAll()
-		.antMatchers(HttpMethod.POST, "/commande/cancel/{id}").permitAll()
-		.antMatchers(HttpMethod.GET, "/commande/getAll").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/commande/getDepuis/{nJours}").hasAnyRole("USER", "ADMIN")
-		.antMatchers(HttpMethod.GET, "/utils/getNbPaginations/{libelleCategorie}/{libelleSousCategorie}").permitAll()
-		.antMatchers(HttpMethod.GET, "/utils/addVisiteSite").permitAll()
-		.antMatchers(HttpMethod.GET, "/utils/addvueProduit/{idProduit}").permitAll()
-		.antMatchers(HttpMethod.GET, "/utils/addPanierSelection/{idSelection}").permitAll()
 		.anyRequest().authenticated();
 
 		http.addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 		http.cors();
 		http.logout().logoutSuccessHandler((req, resp, auth) -> resp.setStatus(HttpStatus.OK.value()))
 				.deleteCookies(TOKEN_COOKIE);
-		
-		
 	}
 
 }
